@@ -1,3 +1,3 @@
-[submodule "ovmf/bin"]
-	path = ovmf/bin
-	url = https://github.com/Absurdponcho/OVMFbin
+[submodule "bootloader/dependencies/gnu-efi"]
+	path = bootloader/dependencies/gnu-efi
+	url = https://git.code.sf.net/p/gnu-efi/code
