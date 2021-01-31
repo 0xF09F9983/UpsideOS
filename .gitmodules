@@ -1,3 +1,0 @@
-[submodule "ovmf/bin"]
-	path = ovmf/bin
-	url = https://github.com/Absurdponcho/OVMFbin
