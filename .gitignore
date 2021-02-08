@@ -1,3 +1,6 @@
+# OS image
+*.img
+
 # UEFI executable
 *.efi
 
