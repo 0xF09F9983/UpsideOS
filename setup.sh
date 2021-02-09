@@ -9,6 +9,10 @@ fi
 losetup --offset 1048576 --sizelimit 46934528 /dev/UpsideOS binaries/OS.img
 mkdosfs -F 32 /dev/UpsideOS
 
+if [ -f "OS/" ]; then
+	mkdir OS/
+fi
+
 if ! mountpoint -q "OS"; then
 	mount /dev/UpsideOS OS/
 fi
