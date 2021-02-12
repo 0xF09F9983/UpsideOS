@@ -1,8 +1,9 @@
+# File and directories
+*/binaries
+loopback.info
+
 # UEFI executable
 *.efi
-
-# Prerequisites
-*.d
 
 # Object files
 *.o
