@@ -1,6 +1,7 @@
 #!/bin/bash
 
 loopback=$(cat loopback.info)
+sudo rm loopback.info 
 
-umount OS/
-losetup -d $loopback
+sudo umount OS/
+sudo losetup -d $loopback

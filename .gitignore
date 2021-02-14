@@ -1,6 +1,8 @@
 # File and directories
-*/binaries
+binaries/
+bootloader/binaries/
 loopback.info
+bootloader/binaries/*.nsh
 
 # UEFI executable
 *.efi
