@@ -1,5 +1,11 @@
-# Prerequisites
-*.d
+# File and directories
+binaries/
+bootloader/binaries/
+loopback.info
+bootloader/binaries/*.nsh
+
+# UEFI executable
+*.efi
 
 # Object files
 *.o
