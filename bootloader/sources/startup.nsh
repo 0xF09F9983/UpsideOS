@@ -2,8 +2,6 @@
 mode 80 25
 
 cls
-echo "[Sartupt Script] Ver:0.1.1"
-
 if exist .\bootloader.efi then
 	.\bootloader.efi
 	echo "[Sartupt Script] Found bootloader on current disk"
