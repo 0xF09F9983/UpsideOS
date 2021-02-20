@@ -16,7 +16,7 @@ CFLAGS = $(addprefix -I ,$(INC_DIRS)) -ffreestanding -fshort-wchar
 
 LDS = kernel.ld
 LD = ld
-LDFLAGS = -T $(LDS) -shared -Bsymbolic -nostdlib
+LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
 all: $(PROGRAM).elf
 	sudo cp $(BIN_DIR)/* ../OS/
@@ -27,9 +27,9 @@ $(PROGRAM).elf: $(C_OBJS)
 
 # Compile the C source files
 $(C_OBJS): $(C_SRCS)
-	@echo Compiling : $^
+	@echo Compiling : $(patsubst $(BUILD_DIR)/%.o,$(SRC_DIR)/%.c,$@) 
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $^ -o $@ 
+	$(CC) $(CFLAGS) -c $(patsubst $(BUILD_DIR)/%.o,$(SRC_DIR)/%.c,$@) -o $@ 
 
 clean:
 	rm $(BIN_DIR)/* $(BUILD_DIR)/*

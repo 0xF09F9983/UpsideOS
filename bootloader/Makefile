@@ -10,6 +10,7 @@ INC_DIRS := $(SRC_DIR) /usr/include/efi /usr/include/efi/x86_64
 BUILD_DIR := build
 
 C_SRCS := $(wildcard $(SRC_DIR)/*.c)
+C_HDRS := $(wildcard $(SRC_DIR)/*.c)
 C_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(C_SRCS))
 
 gnuefi := gnu-efi
@@ -29,10 +30,10 @@ $(PROGRAM).efi: $(C_OBJS)
 	objcopy -j .text -j .sdata -j .data -j .dynamic -j .dynsym  -j .rel -j .rela -j .rel.* -j .rela.* -j .reloc --target efi-app-x86_64 --subsystem=10 $(BUILD_DIR)/$(PROGRAM).so $(BIN_DIR)/$(PROGRAM).efi
 
 # Compile the C source files
-$(C_OBJS): $(C_SRCS)
-	@echo Compiling : $^
+$(C_OBJS): $(C_SRCS) $(C_HDRS)
+	@echo Compiling : $(patsubst $(BUILD_DIR)/%.o,$(SRC_DIR)/%.c,$@) 
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $^ -o $@ 
+	$(CC) $(CFLAGS) -c $(patsubst $(BUILD_DIR)/%.o,$(SRC_DIR)/%.c,$@) -o $@ 
 
 clean:
 	rm $(BIN_DIR)/* $(BUILD_DIR)/*

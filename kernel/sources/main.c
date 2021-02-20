@@ -2,5 +2,5 @@
 
 int kmain()
 {
-	return 0;
+	return 123;
 }
