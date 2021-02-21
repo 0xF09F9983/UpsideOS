@@ -44,11 +44,11 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 	EFI_FILE* kernelfile = LoadFile(NULL, L"kernel.elf");
 	if (kernelfile == NULL)
 	{
-		DEBUG_MSG_ERROR(L"Could not load the kernelfile, LoadFile(NULL, L\"kernel.elf\") returned with error code %d\n\r", ErrorCode)
+		DEBUG_MSG_ERROR(L"Could not load the kernelfile, LoadFile(NULL, L\"kernel.elf\") returned with error code %d\n\r", ErrorCode);
 		return ErrorCode;
 	}
 
-	DEBUG_MSG_TRACE(L"kernel.elf opened")
+	DEBUG_MSG_TRACE(L"kernel.elf opened");
 
 	Elf64_Ehdr header;
 	{
@@ -56,11 +56,12 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 		ErrorCode = uefi_call_wrapper(kernelfile->Read, 3, kernelfile, &size, &header);
 		if (ErrorCode != EFI_SUCCESS)
 		{
-			DEBUG_MSG_ERROR(L"Unable to read the kernel.elf header, kernelfile->Read(kernelfile, &size, &header) returned with error code %d\n\r", ErrorCode)
+			DEBUG_MSG_ERROR(L"Unable to read the kernel.elf header, kernelfile->Read(kernelfile, &size, &header) returned with error code %d\n\r", ErrorCode);
 			return ErrorCode;
 		}
 	}
 
+	// Veryfying if the Elf header has the correct value for us to execute properly
 	if (
 			memcmp(&header.e_ident[EI_MAG0], ELFMAG, SELFMAG) != 0 ||
 			header.e_ident[EI_CLASS] != ELFCLASS64 ||
@@ -70,11 +71,12 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 			header.e_version != EV_CURRENT
 	   )
 	{
-		DEBUG_MSG_ERROR(L"The kernel executable file is ill-formated")
+		DEBUG_MSG_ERROR(L"The kernel executable file is ill-formated");
 		return EFI_ABORTED;
 	}
-	DEBUG_MSG_TRACE(L"kernelfile executable sucessfully verified")
+	DEBUG_MSG_TRACE(L"kernelfile executable sucessfully verified");
 
+	// Reading Program headers list
 	Elf64_Phdr* phdrs;
 	{
 		uefi_call_wrapper(kernelfile->SetPosition, 2, kernelfile, header.e_phoff);
@@ -83,6 +85,7 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 		uefi_call_wrapper(kernelfile->Read, 3, kernelfile, &size, phdrs);
 	}
 
+	// Loading in RAM all the loadadle (and needed) part described in the program headers list
 	for (
 			Elf64_Phdr* phdr = phdrs;
 			(char*)phdr < (char*)phdrs + header.e_phnum * header.e_phentsize;
@@ -100,7 +103,7 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 			uefi_call_wrapper(kernelfile->Read, 3, kernelfile, &size, (void *)segment);
 		}
 	}
-	DEBUG_MSG_TRACE(L"kernelfile Loaded successfully")
+	DEBUG_MSG_TRACE(L"kernelfile Loaded successfully");
 	
 	// Obtain the Graphical Output Protocol (GOP)
 	{
@@ -115,12 +118,12 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 	ErrorCode = uefi_call_wrapper(Gop->Blt, 10, Gop, &black, EfiBltVideoFill, 0, 0, 0, 0, Gop->Mode->Info->HorizontalResolution, Gop->Mode->Info->VerticalResolution, 0);
 	if (ErrorCode != EFI_SUCCESS)
 	{
-		DEBUG_MSG_ERROR(L"Could not clean the screen")
+		DEBUG_MSG_ERROR(L"Could not clean the screen");
 	}
 
 	int (*kernel)() = ((__attribute__((sysv_abi)) int (*)() ) header.e_entry);
+	kernel();
 
-	Print(L"[Bootloader] kernelfile returned %d after call\n\r", kernel());
 	
 	return EFI_SUCCESS;
 }

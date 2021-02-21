@@ -3,6 +3,7 @@ binaries/
 bootloader/binaries/
 loopback.info
 bootloader/binaries/*.nsh
+ovmf/OVMF_VARS-pure-efi.fd
 
 # UEFI executable
 *.efi
