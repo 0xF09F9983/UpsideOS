@@ -19,8 +19,6 @@ EFI_STATUS ErrorCode;
 EFI_HANDLE ImageHandle;
 EFI_BOOT_SERVICES* BootServices;
 
-
-
 int memcmp(const void* aptr, const void* bptr, size_t n)
 {
 	const uint8_t *a = aptr, *b = bptr;
@@ -32,12 +30,16 @@ int memcmp(const void* aptr, const void* bptr, size_t n)
 	return 0;
 }
 
+
+EFI_GRAPHICS_OUTPUT_PROTOCOL* Gop = NULL;
+
 EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 {
 	ImageHandle = Image;
 	BootServices = SystemTable->BootServices;
 
 	InitializeLib(Image, SystemTable);
+
 
 	EFI_FILE* kernelfile = LoadFile(NULL, L"kernel.elf");
 	if (kernelfile == NULL)
@@ -100,6 +102,22 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 	}
 	DEBUG_MSG_TRACE(L"kernelfile Loaded successfully")
 	
+	// Obtain the Graphical Output Protocol (GOP)
+	{
+		EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+		ErrorCode = uefi_call_wrapper(BootServices->LocateProtocol, 3, &gopGuid, NULL, (void **)&Gop);
+		if (ErrorCode != EFI_SUCCESS)
+			return EFI_ABORTED;
+	}
+
+	// Clear the screen
+	EFI_GRAPHICS_OUTPUT_BLT_PIXEL black = {0, 0, 0, 0};
+	ErrorCode = uefi_call_wrapper(Gop->Blt, 10, Gop, &black, EfiBltVideoFill, 0, 0, 0, 0, Gop->Mode->Info->HorizontalResolution, Gop->Mode->Info->VerticalResolution, 0);
+	if (ErrorCode != EFI_SUCCESS)
+	{
+		DEBUG_MSG_ERROR(L"Could not clean the screen")
+	}
+
 	int (*kernel)() = ((__attribute__((sysv_abi)) int (*)() ) header.e_entry);
 
 	Print(L"[Bootloader] kernelfile returned %d after call\n\r", kernel());
