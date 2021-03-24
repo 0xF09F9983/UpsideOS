@@ -41,7 +41,8 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 	InitializeLib(Image, SystemTable);
 
 
-	EFI_FILE* kernelfile = LoadFile(NULL, L"kernel.elf");
+	// Open the 64 bit architecture kernel
+	EFI_FILE* kernelfile = LoadFile(NULL, L"kernel64.elf");
 	if (kernelfile == NULL)
 	{
 		DEBUG_MSG_ERROR(L"Could not load the kernelfile, LoadFile(NULL, L\"kernel.elf\") returned with error code %d\n\r", ErrorCode);
