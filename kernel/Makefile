@@ -5,7 +5,7 @@ PROGRAM = kernel64
 
 BIN_DIR = binaries
 SRC_DIR = sources
-INC_DIRS = $(SRC_DIR)
+INC_DIRS = $(SRC_DIR) /usr/include/efi /usr/include/efi/x86_64
 BUILD_DIR = build
 
 C_SRCS = $(wildcard $(SRC_DIR)/*.c)

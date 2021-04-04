@@ -122,8 +122,8 @@ EFI_STATUS efi_main(EFI_HANDLE Image, EFI_SYSTEM_TABLE* SystemTable)
 		DEBUG_MSG_ERROR(L"Could not clean the screen");
 	}
 
-	int (*kernel)() = ((__attribute__((sysv_abi)) int (*)() ) header.e_entry);
-	kernel();
+	void (*kernel)(EFI_GRAPHICS_OUTPUT_PROTOCOL* gop) = ((__attribute__((sysv_abi)) void (*)(EFI_GRAPHICS_OUTPUT_PROTOCOL*) ) header.e_entry);
+	kernel(Gop);
 
 	
 	return EFI_SUCCESS;
