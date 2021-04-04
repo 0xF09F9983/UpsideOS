@@ -1,11 +1,11 @@
 # Suppress the *annoying* implicit rules
 .SUFFIXES: 
 
-PROGRAM = kernel
+PROGRAM = kernel64
 
 BIN_DIR = binaries
 SRC_DIR = sources
-INC_DIRS = $(SRC_DIR)
+INC_DIRS = $(SRC_DIR) /usr/include/efi /usr/include/efi/x86_64
 BUILD_DIR = build
 
 C_SRCS = $(wildcard $(SRC_DIR)/*.c)
@@ -18,6 +18,7 @@ LDS = kernel.ld
 LD = ld
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
+.PHONY: all
 all: $(PROGRAM).elf
 	sudo cp $(BIN_DIR)/* ../OS/
 
@@ -31,5 +32,16 @@ $(C_OBJS): $(C_SRCS)
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $(patsubst $(BUILD_DIR)/%.o,$(SRC_DIR)/%.c,$@) -o $@ 
 
+.PHONY: setup
+setup:
+	-mkdir binaries/
+	-mkdir build/
+
+.PHONY: reset
+reset:
+	rm -drf binaries/
+	rm -drf build/
+
+.PHONY: clean
 clean:
 	rm $(BIN_DIR)/* $(BUILD_DIR)/*
